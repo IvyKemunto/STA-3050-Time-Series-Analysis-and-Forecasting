@@ -1,0 +1,350 @@
+---
+title: "Quiz 1- Time Series (STA3050A)"
+author: "Ivy Kemunto"
+date: "2024-05-19"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### The annual expenditure levels (in millions) to promote products and services for the financial services sector such as banks, insurance, investments, etc. from 2015 to 2022 are shown in the following table:
+
+| Year        | 2015 | 2016 | 2017 | 2018 | 2019 | 2020 | 2021 | 2022 |
+|-------------|------|------|------|------|------|------|------|------|
+| Expenditure | 5.5  | 7.2  | 8.0  | 9.6  | 10.2 | 11.0 | 12.5 | 14.0 |
+
+### Use exponential smoothing to obtain filtered values by taking α = 0.5, α = 0.7, α = 0.9 and calculate the forecast errors. Also, plot the original and smoothed values.
+
+## Exponential Smoothing
+
+***In order to tackle this question, we first need to observe the characteristics of the data in order to determine the type of exponential smoothing we will be conducting***
+
+**Characteristics of the Data**
+
+1.  **Univariate Data:** The dataset consists of a single variable: annual expenditure levels.
+2.  **No Trend:** There is no clear upward or downward trend in the data over the years.
+3.  **No Seasonal Pattern:** The data does not exhibit any seasonal patterns, such as regular fluctuations that repeat over a specific period (e.g., monthly, quarterly).
+4.  **Single Parameter (Alpha):** We have defined $\alpha = 0.5$ & $\alpha = 0.7$ & $\alpha = 0.9$\
+
+Given the above characteristics we will therefore use **Simple or single exponential smoothing (SES)**.
+
+**Simple or single exponential smoothing (SES):** This is a method of time series forecasting used with univariate data with no trend and no seasonal pattern. It needs a single parameter called alpha ($\alpha$), also known as the smoothing factor. Alpha controls the rate at which the influence of past observations decreases exponentially. The parameter is often set to a value between 0 and 1.
+
+**We will then proceed with the calculations**
+
+In order to calculate $SES$ for the above question;
+
+The smoothing formula can be expressed as follows:
+
+$$
+S_t = \alpha \cdot X_t + (1 - \alpha) \cdot S_{t-1}
+$$
+
+or equivalently:
+
+$$
+S_t = S_{t-1} + \alpha (X_t - S_{t-1})
+$$
+
+where:
+
+-   $S_t$ is the smoothed value at time $t$.
+-   $X_t$ is the actual value at time $t$.
+-   $S_{t-1}$ is the smoothed value at time $t-1$.
+-   $\alpha$ is the smoothing factor $(0 < \alpha < 1)$.
+
+**Data**
+
+Annual expenditure levels (in millions) for promoting products and services in the financial services sector from 2015 to 2022 are as follows:
+
+---
+title: "GDP by Year"
+output: pdf_document
+---
+
+$$
+\begin{array}{|c|c|c|c|c|c|c|c|c|c|c|}
+\hline
+\text{Year} & 2011 & 2012 & 2013 & 2014 & 2015 & 2016 & 2017 & 2018 & 2019 & 2020 \\
+\hline
+\text{GDP}  & 35   & 37   & 51   & 54   & 62   & 64   & 74   & 71   & 83   & 80   \\
+\hline
+\end{array}
+$$
+
+We then proceed to injecting the values into the formula. We will do for a few values as we are still going to generate the rest of the values computationally.
+
+### Injecting Values into the Formula
+
+#### For $\alpha = 0.5$
+
+Initialization: $$
+S_1 = X_1 = 5.5
+$$ ***Calculations:***
+
+**Year 2016**
+
+$$
+\begin{aligned}
+S_2 &= 0.5 \cdot 7.2 + (1 - 0.5) \cdot 5.5 \\
+S_2 &= 0.5 \cdot 7.2 + 0.5 \cdot 5.5 \\
+S_2 &= 3.6 + 2.75 \\
+S_2 &= 6.35 \\
+\end{aligned}
+$$
+
+**Year 2017**
+
+$$
+\begin{aligned}
+S_3 &= 0.5 \cdot 8.0 + (1 - 0.5) \cdot 6.35 \\
+S_3 &= 0.5 \cdot 8.0 + 0.5 \cdot 6.35 \\
+S_3 &= 4.0 + 3.175 \\
+S_3 &= 7.175 \\
+\end{aligned}
+$$
+
+#### For $\alpha = 0.7$
+
+Initialization:
+
+$$
+S_1 = X_1 = 5.5
+$$
+
+***Calculations:***
+
+**Year 2016**
+
+$$
+\begin{aligned}
+S_2 &= 0.7 \cdot 7.2 + (1 - 0.7) \cdot 5.5 \\
+S_2 &= 0.7 \cdot 7.2 + 0.3 \cdot 5.5 \\
+S_2 &= 5.04 + 1.65 \\
+S_2 &= 6.69 \\
+\end{aligned}
+$$
+
+**Year 2017**
+
+$$
+\begin{aligned}
+S_3 &= 0.7 \cdot 8.0 + (1 - 0.7) \cdot 6.69 \\
+S_3 &= 0.7 \cdot 8.0 + 0.3 \cdot 6.69 \\
+S_3 &= 5.6 + 2.007 \\
+S_3 &= 7.607 \\
+\end{aligned}
+$$
+
+#### For $\alpha = 0.9$
+
+Initialization:
+
+$$
+S_1 = X_1 = 5.5
+$$
+
+***Calculations:***
+
+**Year 2016** $$
+\begin{aligned}
+S_2 &= 0.9 \cdot 7.2 + 0.1 \cdot 5.5 \\
+S_2 &= 0.9 \cdot 7.2 + 0.1 \cdot 5.5 \\
+S_2 &= 6.48 + 0.55 \\
+S_2 &= 7.03 \\
+\end{aligned}
+$$
+
+**Year 2017**
+
+$$
+\begin{aligned}
+S_3 &= 0.9 \cdot 8.0 + 0.1 \cdot 7.03 \\
+S_3 &= 0.9 \cdot 8.0 + 0.1 \cdot 7.03 \\
+S_3 &= 7.2 + 0.703 \\
+S_3 &= 7.903 \\
+\end{aligned}
+$$
+
+**We then proceed to generate the values computationally**
+
+```{r}
+#Loading necessary libraries
+library(ggplot2)
+#Data
+yr<-2015:2022
+expn<-c(5.5,7.2,8.0,9.6,10.2,11.0,12.5,14.0)
+#exponential smoothing
+e_s<-function(series,alpha){result<-numeric(length(series))
+  result[1]<-series[1]
+  for (n in 2:length(series)){result[n]<-alpha*series[n]+(1 - alpha)*result[n-1]}
+  return(result)
+}
+#Calculating the smoothed values for different alphas
+smoothed_0_5<-e_s(expn,0.5)
+smoothed_0_7<-e_s(expn,0.7)
+smoothed_0_9<-e_s(expn,0.9)
+#Generating table containing the results
+res<-data.frame(Year=yr,Expenditure=expn,Alpha_0_5=smoothed_0_5,Alpha_0_7=smoothed_0_7,Alpha_0_9=smoothed_0_9)
+print(res)
+```
+
+#### Interpretation of the table
+
+The table shows the annual expenditure levels for promoting products and services in the financial services sector from 2015 to 2022. Exponential smoothing is applied to this data with different smoothing factors ($\alpha$).
+
+-   **It can be observed that our initial manual calculations are in congruence with our computational calculations as seen in the table of generated values.**
+
+#### In regards to the generated values...
+
+###### For $\alpha = 0.5$
+
+-   The smoothing factor $\alpha = 0.5$ means that the current observation and the previous smoothed value are equally weighted.
+-   Starting with $2015$, the smoothed values gradually follow the actual expenditures, but with some lag. The influence of past values decreases at a moderate rate by $2022$, the smoothed value is $12.66172$, which is lower than the actual value of $14.0$.
+
+###### For $\alpha = 0.7$
+
+-   The smoothing factor $\alpha = 0.7$ gives more weight to the current observation compared to the previous smoothed value.
+-   The smoothed values react more quickly to changes in the actual data than with $\alpha = 0.5$, resulting in a closer fit to the actual values by $2022$, the smoothed value is $13.38370$, which is closer to the actual value compared to $\alpha = 0.5$.
+
+###### For $\alpha = 0.9$
+
+-   The smoothing factor $\alpha = 0.9$ gives a high weight to the current observation, making the smoothed values very responsive to changes in the actual data.
+-   The smoothed values closely follow the actual expenditures with minimal lag, quickly adapting to changes by $2022$, the smoothed value is $13.83412$, which is very close to the actual value of $14.0$.
+
+We can therefore conclude that as $\alpha$ **increases**, the smoothed values become more responsive to the actual data. Higher $\alpha$ values result in smoothed values that are closer to the actual expenditures.Lower $\alpha$ values smooth the data more, resulting in greater lag and less responsiveness to changes in the actual expenditures.
+
+## Forecast error
+
+In order to calculate the forecast errors , we proceed as follows:
+
+The forecast error formula is given by:
+
+$$
+e_t = X_t - S_t
+$$
+
+where:
+
+$$
+\begin{aligned}
+e_t & \text{ is the forecast error at time } t. \\
+X_t & \text{ is the actual value at time } t. \\
+S_t & \text{ is the smoothed value at time } t, \text{ calculated using the exponential smoothing formula}.
+\end{aligned}
+$$
+
+We then proceed to workout the forecast errors manually. Since we have the smoothed values already , we will just inject those into the calculation. We will calculate the Forecast errors for the years $2015$-$2017$.
+
+#### For $\alpha = 0.5$
+
+***Forecast Errors:***
+
+$$
+\begin{aligned}
+e_1 &= 5.5 - 5.5 = 0.00000 \\
+e_2 &= 7.2 - 6.35 = 0.85000 \\
+e_3 &= 8.0 - 7.175 = 0.82500 \\
+\end{aligned}
+$$
+
+#### For $\alpha = 0.7$
+
+***Forecast Errors:***
+
+$$
+\begin{aligned}
+e_1 &= 5.5 - 5.5 = 0.00000 \\
+e_2 &= 7.2 - 6.69 = 0.51000 \\
+e_3 &= 8.0 - 7.607 = 0.39300 \\
+\end{aligned}
+$$
+
+#### For $\alpha = 0.9$
+
+***Forecast Errors:***
+
+$$
+\begin{aligned}
+e_1 &= 5.5 - 5.5 = 0.00000 \\
+e_2 &= 7.2 - 7.03 = 0.17000 \\
+e_3 &= 8.0 - 7.903 = 0.09700 \\
+\end{aligned}
+$$
+
+**We then proceed with the computational calculations.**
+
+```{r}
+# Calculate forecast errors
+f_e<-data.frame(Year=yr,Alpha_0_5=expn-smoothed_0_5,Alpha_0_7=expn-smoothed_0_7,Alpha_0_9=expn-smoothed_0_9)
+#Forecast errors
+print(f_e)
+```
+
+**Interpretation of Forecast Errors**
+
+#### For $\alpha = 0.5$:
+
+-   The forecast errors show how well the smoothing factor of 0.5 fits the actual values.The errors start at 0 in 2015 and gradually increase, indicating that the smoothed values are lagging behind the actual values. The errors are higher in later years, suggesting that $\alpha = 0.5$ is not as responsive to recent changes.
+
+#### For $\alpha = 0.7$:
+
+-   With $\alpha = 0.7$, the errors are generally lower compared to $\alpha = 0.5$. This indicates a better fit as $\alpha = 0.7$ gives more weight to recent observations. The errors are more moderate, showing that the smoothing is more responsive to changes in the actual data.
+
+#### For $\alpha = 0.9$:
+
+-   The forecast errors for $\alpha = 0.9$ are the lowest among the three.This indicates the highest responsiveness to recent changes, as $\alpha = 0.9$ heavily weights the most recent observation. The smaller errors suggest that the smoothed values closely follow the actual data, making this the most accurate smoothing factor among the ones tested.
+
+In conclusion as the smoothing factor $\alpha$ increases, the forecast errors decrease, indicating a better fit to the actual data.Higher values of $\alpha$ result in smoothed values that are more responsive to recent changes, while lower values of $\alpha$ result in greater lag and less responsiveness.Based on the forecast errors, $\alpha = 0.9$ provides the best fit among the tested values, as it minimizes the forecast errors and closely follows the actual data.
+
+## Plotting the Graphs
+
+```{r}
+#Preparing data for plotting
+pd<-data.frame(Year=rep(yr,4),Expenditure=c(expn,smoothed_0_5,smoothed_0_7,smoothed_0_9),Type =rep(c("Original","Alpha=0.5","Alpha=0.7","Alpha=0.9"),each = length(yr))
+)
+#Plotting
+ggplot(pd,aes(x=Year,y=Expenditure,color=Type))+geom_line(size=1)+geom_point(size=2)+labs(title="Exponential Smoothing of Expenditure Data",x = "Year", y = "Expenditure (in millions)")+theme_minimal()
+```
+
+#### Interpretation of the Plot
+
+The plot shows the original expenditure data and the smoothed values obtained using exponential smoothing with three different alpha values ($\alpha = 0.5$, $\alpha = 0.7$, and $\alpha = 0.9$) from the years 2015 to 2022.
+
+**Original Data (Purple Line)**
+
+-   The original data points are represented by the purple line. This line shows the actual expenditure values for each year from $2015$ to $2022$.
+
+#### Alpha=0.5 (Red Line)
+
+-   The red line represents the smoothed values with $\alpha = 0.5$.
+-   This line is smoother and shows less responsiveness to changes in the actual data compared to higher alpha values.
+-   It tends to lag behind the actual values, especially in years where there is a significant change in expenditure.
+
+#### Alpha=0.7 (Green Line)
+
+-   The green line represents the smoothed values with $\alpha = 0.7$.
+-   This line is more responsive to changes in the actual data compared to $\alpha = 0.5$.
+-   It provides a closer fit to the actual expenditure values but still shows some smoothing effect.
+
+#### Alpha=0.9 (Blue Line)
+
+-   The blue line represents the smoothed values with $\alpha = 0.9$.
+-   This line is the most responsive to changes in the actual data, closely following the actual expenditure values.
+-   The high alpha value results in minimal smoothing, making the smoothed values very similar to the actual values.
+
+**Higher Alpha Values**
+
+-   As the alpha value increases, the smoothed values become more responsive to the actual data, resulting in smaller forecast errors. This is evident from the blue line ($\alpha = 0.9$), which closely follows the original data points.
+
+**Lower Alpha Values**
+
+-   Lower alpha values result in greater smoothing and less responsiveness to changes in the data. The red line ($\alpha = 0.5$) demonstrates this by showing a smoother curve that lags behind the actual expenditure values.
+
+**Medium Alpha Values**
+
+-   The green line ($\alpha = 0.7$) provides a balance between responsiveness and smoothing, fitting the data better than the red line but not as closely as the blue line.
+
+**Conclusion** In this case, $\alpha = 0.9$ provides the closest fit to the actual expenditure values, indicating that the recent observations have a strong influence on the future expenditures.

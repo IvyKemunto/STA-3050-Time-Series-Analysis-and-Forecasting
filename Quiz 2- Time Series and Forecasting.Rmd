@@ -1,0 +1,425 @@
+---
+title: "Quiz 2- Time Series and Forecasting"
+author: "Ivy Kemunto"
+date: "2024-05-22"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## The following table gives the gross domestic product (GDP) in 100 million for a certain country from 2010 to 2020:
+
+$$
+\begin{array}{|c|c|c|c|c|c|c|c|c|c|c|}
+\hline
+\text{Year} & 2011 & 2012 & 2013 & 2014 & 2015 & 2016 & 2017 & 2018 & 2019 & 2020 \\
+\hline
+\text{GDP}  & 35   & 37   & 51   & 54   & 62   & 64   & 74   & 71   & 83   & 80   \\
+\hline
+\end{array}
+$$
+
+## i. Fit a trend line for GDP data and find trend values with the help of trendline.
+
+To answer this question , we need to use the following formulas:
+
+1.  **Linear Trend Model** The linear trend model assumes a linear relationship between the GDP and the years. The equation for the linear trend is:
+
+    $$ Y_t = \beta_0 + \beta_1 t $$
+
+    Where:
+
+    -   $Y_t$ is the GDP at time $t$
+    -   $\beta_0$ is the intercept
+    -   $\beta_1$ is the slope of the trend line
+
+    We can estimate the coefficients $\beta_0$ and $\beta_1$ using the least squares method.
+
+2.  **Quadratic Trend Model** The quadratic trend model assumes a curvilinear relationship between the GDP and the years. The equation for the quadratic trend is:
+
+    $$ Y_t = \beta_0 + \beta_1 t + \beta_2 t^2 $$
+
+    Where:
+
+    -   $Y_t$ is the GDP at time $t$
+    -   $\beta_0$, $\beta_1$, and $\beta_2$ are the coefficients
+
+3.  **Exponential Trend Model** The exponential trend model assumes an exponential relationship between the GDP and the years. The equation for the exponential trend is:
+
+    $$ Y_t = \beta_0 e^{\beta_1 t} $$
+
+    Alternatively, taking the natural logarithm:
+
+    $$ \log(Y_t) = \log(\beta_0) + \beta_1 t $$
+
+```{r}
+#librarY
+library(ggplot2)
+#Data
+years<-2011:2020
+gdp<-c(35, 37, 51, 54, 62, 64, 74, 71, 83, 80)
+#data frame
+data<-data.frame(years,gdp)
+#Linear regression model
+linear_model<-lm(gdp~years,data=data)
+linear_trend<-predict(linear_model,data)
+# Quadratic regression model
+quadratic_model<-lm(gdp~poly(years,2,raw=TRUE),data=data)
+quadratic_trend<-predict(quadratic_model, data)
+#Exponential regression model
+exp_model<-lm(log(gdp)~years,data=data)
+exp_trend<-exp(predict(exp_model,data))
+#data frame for trends
+trend_data<-data.frame(years=rep(years,4),gdp=c(gdp,linear_trend,quadratic_trend,exp_trend),model=rep(c("Actual","Linear","Quadratic","Exponential"),each=length(years)))
+#Plot
+ggplot(trend_data,aes(x=years,y=gdp,color=model))+geom_line(size=0.5)+scale_color_manual(values=c("blue","red","green","purple"))+labs(title='GDP Trend Analysis',x='Year',y='GDP (in 100 million)',color="Model")+theme_minimal()+theme(plot.title=element_text(hjust=0.5))
+#Output model summaries to determine the best fit
+summary(linear_model)
+summary(quadratic_model)
+summary(exp_model)
+```
+
+# Linear Trend Model
+
+The linear trend model is given by:
+
+$$Y_t = \beta_0 + \beta_1 t$$
+
+**Coefficients:**
+
+-   Intercept ($\beta_0$): -10800
+-   Slope ($\beta_1$): 5.388
+
+**Interpretation:**
+
+-   **Intercept (**$\beta_0$): -10800 (The GDP value when the year is 0, which is not meaningful in this context since we don't have data for year 0).
+-   **Slope (**$\beta_1$): 5.388 (For each year increase, the GDP increases by 5.388 units).
+
+**Model Summary:**
+
+-   **Residual Standard Error**: 4.031
+-   **Multiple R-squared**: 0.9485 (94.85% of the variability in GDP can be explained by the linear model).
+-   **Adjusted R-squared**: 0.9421 (Adjusted for the number of predictors in the model).
+-   **F-statistic**: 147.4 with a p-value of 1.962e-06 (Highly significant, indicating that the model is a good fit).
+
+# Quadratic Trend Model
+
+The quadratic trend model is given by:
+
+$$Y_t = \beta_0 + \beta_1 t + \beta_2 t^2$$
+
+**Coefficients:**
+
+-   Intercept ($\beta_0$): -1.242e+06
+-   $\beta_1$: 1.227e+03
+-   $\beta_2$: -3.030e-01
+
+**Interpretation:**
+
+-   **Intercept (**$\beta_0$): -1242000 (The GDP value when the year is 0, which is not meaningful in this context).
+-   $\beta_1$: 1.227e+03 (Linear term coefficient).
+-   $\beta_2$: -3.030e-01 (Quadratic term coefficient).
+
+**Model Summary:**
+
+-   **Residual Standard Error**: 3.412
+-   **Multiple R-squared**: 0.9677 (96.77% of the variability in GDP can be explained by the quadratic model).
+-   **Adjusted R-squared**: 0.9585
+-   **F-statistic**: 104.9 with a p-value of 6.043e-06 (Highly significant, indicating that the model is a good fit).
+
+# Exponential Trend Model
+
+The exponential trend model is given by:
+
+$$\log(Y_t) = \log(\beta_0) + \beta_1 t$$
+
+**Coefficients:**
+
+-   Intercept ($\log(\beta_0)$): -188.03153
+-   $\beta_1$: 0.09531
+
+**Interpretation:**
+
+-   **Intercept (**$\log(\beta_0)$): -188.03153 (log-transformed GDP value when the year is 0, not directly interpretable in the original scale).
+-   $\beta_1$: 0.09531 (For each year increase, the log of GDP increases by 0.09531 units).
+
+**Model Summary:**
+
+-   **Residual Standard Error**: 0.09601
+-   **Multiple R-squared**: 0.9104 (91.04% of the variability in the log of GDP can be explained by the exponential model).
+-   **Adjusted R-squared**: 0.8992
+-   **F-statistic**: 81.31 with a p-value of 1.828e-05 (Highly significant, indicating that the model is a good fit).
+
+# Conclusion
+
+Based on the R-squared values and the F-statistics, we can conclude that all three models are statistically significant and provide a good fit for the GDP data. The quadratic model has the highest R-squared value (96.77%), indicating that it explains the most variability in GDP among the three models. \# Trend Models and Visual Interpretation
+
+## Actual Data (Blue Line)
+
+The blue line represents the actual GDP data from 2011 to 2020.
+
+## Linear Trend (Green Line)
+
+The green line represents the linear trend. It shows a steady, linear increase in GDP over the years.
+
+-   The linear model fits well but may not capture the curvature in the data as effectively as the quadratic model.
+
+## Quadratic Trend (Purple Line)
+
+The purple line represents the quadratic trend. It captures the curvature in the data better than the linear model.
+
+-   The quadratic model has the highest R-squared value, indicating the best fit among the three models.
+
+## Exponential Trend (Red Line)
+
+The red line represents the exponential trend. It shows a continuously accelerating growth in GDP.
+
+-   The exponential model fits the data well but less effectively than the quadratic model.
+
+## Conclusion
+
+Based on the R-squared values and the visual fit, the quadratic model appears to be the best fit for the GDP data. It captures the curvature in the data better than the linear model and explains a higher percentage of the variability in GDP compared to the exponential model.
+
+## ii. Find forecast errors.
+
+## Forecast error
+
+In order to calculate the forecast errors , we proceed as follows:
+
+The forecast error formula is given by:
+
+$$ \text{Forecast Error} = \text{Actual Value} - \text{Predicted Value} $$
+
+```{r}
+#Calculating forecast errors
+forecast_errors<-data.frame(years=years,actual=gdp,linear_error=gdp-linear_trend,quadratic_error=gdp-quadratic_trend,exponential_error=gdp-exp_trend)
+#forecast errors dataframe
+print(forecast_errors)
+```
+
+# Forecast Error Analysis
+
+## Linear Model
+
+The linear model tends to oscillate between overestimation and underestimation. It has larger forecast errors in some years, such as 2012 and 2020.
+
+## Quadratic Model
+
+The quadratic model generally performs well but has significant errors in 2012 and 2016. It also has smaller errors in many other years.
+
+## Exponential Model
+
+The exponential model tends to have larger errors in most years, especially in 2020, indicating that it may not be the best fit for this data.
+
+## Conclusion
+
+Based on the forecast errors, the quadratic model seems to have the smallest and most balanced errors overall, suggesting it is the best fit for this data. The linear model has moderate performance, while the exponential model has larger errors, making it less suitable for this dataset.
+
+## iii. Use best-fit trend model to predict the country’s GDP for 2022.
+
+```{r}
+# Predict GDP for 2022 using the models
+linear_trend_2022 <- predict(linear_model, newdata = data.frame(years = 2022))
+quadratic_trend_2022 <- predict(quadratic_model, newdata = data.frame(years = 2022))
+exp_trend_2022 <- exp(predict(exp_model, newdata = data.frame(years = 2022)))
+# Print predicted GDP for 2022 for all models
+print(paste("Linear model prediction for 2022:", linear_trend_2022))
+print(paste("Quadratic model prediction for 2022:", quadratic_trend_2022))
+print(paste("Exponential model prediction for 2022:", exp_trend_2022))
+```
+
+
+# Comparison and Conclusion
+
+-   **Exponential Model**: Predicts the highest GDP for 2022 at 109.25. This suggests a rapidly accelerating growth rate, which may be overly optimistic if the actual growth does not continue to accelerate.
+-   **Linear Model**: Predicts a moderate GDP for 2022 at 96.12, assuming a consistent growth rate.
+-   **Quadratic Model**: Predicts the lowest GDP for 2022 at 85.82. This model accounts for changes in growth rate and may provide a more balanced estimate if the growth rate is decelerating.
+
+## Question 2: The number of subscribers to a streaming service from 2014 to 2021 is given in the following table:
+
+$$
+\begin{array}{|c|c|c|c|c|c|c|c|}
+\hline
+\text{Year} & 2014 & 2015 & 2016 & 2017 & 2018 & 2019 & 2020 & 2021 \\
+\hline
+\text{Subscribers (in millions)} & 2 & 5 & 11 & 20 & 35 & 50 & 70 & 95 \\
+\hline
+\end{array}
+$$
+
+## i. Fit the exponential trend.
+
+# Data Transformation
+
+We need to transform the data using the natural logarithm to linearize the exponential growth. The exponential growth model is given by:
+
+$$ 
+Y_t = \beta_0 e^{\beta_1 t} 
+$$
+
+Taking the natural logarithm on both sides, we get:
+
+$$ 
+\log(Y_t) = \log(\beta_0) + \beta_1 t 
+$$
+
+# Linear Regression
+
+We fit a linear regression model to the log-transformed data. The linear model can be written as:
+
+$$ 
+\log(Y_t) = \alpha + \beta t 
+$$
+
+Where:
+
+$$ 
+\alpha = \log(\beta_0) 
+$$
+
+$$ 
+\beta = \beta_1 
+$$
+
+```{r}
+# Define the data
+years<-c(2014,2015,2016,2017,2018,2019,2020,2021)
+subscribers<-c(2,5,11,20,35,50,70,95)
+time<-years - 2014
+#natural logarithm to the subscribers
+log_subscribers<-log(subscribers)
+model <- lm(log_subscribers ~ time)
+#model summary
+summary(model)
+#exponential trend
+fitted_log_values<-predict(model)
+fitted_values<-exp(fitted_log_values)
+#Create a data frame for visualization
+data<-data.frame(years=years,subscribers=subscribers,fitted_values=fitted_values)
+
+#Plot
+ggplot(data,aes(x=years))+geom_line(aes(y = subscribers, color = "Actual Data"), size = 0.5) +geom_line(aes(y = fitted_values, color = "Fitted Trend"), size = 0.5) +scale_color_manual(name = "Legend", values = c("Actual Data" = "red", "Fitted Trend" = "blue")) +labs(title = "Exponential Trend of Subscribers", x = "Year",y = "Subscribers (in millions)") +theme_minimal()
+```
+
+## Coefficients
+
+-   **Intercept (**$\alpha$): 1.10731
+-   **Slope (**$\beta$): 0.53955
+
+These coefficients are used in the log-transformed linear model:
+
+$$ 
+\log(Y_t) = \alpha + \beta t 
+$$
+
+Thus,
+
+$$ 
+\log(Y_t) = 1.10731 + 0.53955 \cdot t 
+$$
+
+To transform back to the original exponential model:
+
+$$ 
+Y_t = e^{1.10731} \cdot e^{0.53955 \cdot t} 
+$$
+
+$$ 
+Y_t = 3.026 \cdot e^{0.53955 \cdot t} 
+$$
+
+Where:
+
+$$ 
+\beta_0 = e^{1.10731} \approx 3.026 
+$$ 
+
+
+$$ 
+\beta_1 = 0.53955 
+$$
+
+## Model Fit
+
+-   **Multiple R-squared**: 0.9604 (96.04% of the variability in the log of subscribers can be explained by the model).
+-   **Adjusted R-squared**: 0.9538 (Adjusted for the number of predictors).
+-   **Residual Standard Error**: 0.2899 (Indicates the average deviation of the actual log-transformed values from the fitted log-transformed values).
+-   **F-statistic**: 145.5 with a p-value of 1.971e-05 (Indicates that the model is highly significant).
+
+## Visualization Interpretation
+
+### Plot Description
+
+-   **Red Line (Actual Data)**: Represents the actual number of subscribers (in millions) from 2014 to 2021.
+-   **Blue Line (Fitted Trend)**: Represents the exponential trend fitted to the actual data.
+
+### Observations
+
+-   The fitted trend (blue line) closely follows the actual data (red line) for most of the period from 2014 to 2021.
+-   The trend captures the exponential growth pattern, showing an increasing rate of growth over time.
+-   The model appears to slightly overestimate the number of subscribers towards the end of the period (2020 and 2021), which could be due to the high exponential growth rate.
+-   The exponential trend model effectively captures the exponential growth in the number of subscribers. The fitted model has high R-squared values, indicating a good fit to the data. The visualization confirms that the model's predictions closely match the actual data, validating the use of an exponential trend model for this scenario.
+
+## ii. Find the forecast errors.
+
+The forecast error formula is given by:
+
+$$ 
+\text{Forecast Error} = \text{Actual Value} - \text{Predicted Value} 
+$$
+
+```{r}
+
+#(exponential trend)
+fitted_values<-exp(predict(model))
+#forecast errors
+forecast_errors <- subscribers - fitted_values
+# Create a data frame with actual subscribers, fitted values, and forecast errors
+results_df<-data.frame(Year = years,Actual_Subscribers = subscribers,Fitted_Values = fitted_values, Forecast_Errors = forecast_errors)
+print(results_df)
+```
+
+-   The model performs relatively well in the early years (2014 to 2019), with smaller forecast errors.
+
+-   There is a trend of increasing underestimation as we move from 2016 to 2019.
+
+-   In the later years (2020 and 2021), the model tends to overestimate the number of subscribers significantly.
+
+-   The forecast errors are relatively small in the middle years (2016-2019), but they increase in magnitude towards the end of the period (2020-2021).
+
+-   The exponential model is a good fit for the data up to a certain point but starts to diverge significantly in the later years.
+
+-   The large forecast errors in 2020 and 2021 indicate that the actual growth rate might be slowing down or not following the exponential trend as closely as before.
+
+-   While the exponential model captures the general trend of growth, it may not accurately capture the rate of growth in the most recent years. This suggests that the actual growth rate might be different from the assumed exponential growth rate.
+
+## iii. Use the exponential trend model to predict the number of subscribers for 2024.
+
+```{r}
+#Predict the number of subscribers for 2024
+time_2024<-2024-2014
+predicted_log_subscribers_2024<-predict(model, newdata = data.frame(time = time_2024))
+predicted_subscribers_2024<-exp(predicted_log_subscribers_2024)
+cat("Predicted number of subscribers for 2024:",predicted_subscribers_2024, "\n")
+#prediction for 2024 to the data frame
+prediction_df<-data.frame(Year=2024,Actual_Subscribers=NA,Fitted_Values=predicted_subscribers_2024,Forecast_Errors=NA)
+combined_df<-rbind(results_df, prediction_df)
+#Plot
+ggplot(combined_df,aes(x=Year))+geom_line(aes(y=Actual_Subscribers,color="Actual Data"),size= 0.5)+geom_line(aes(y = Fitted_Values,color="Fitted Trend"),size=0.5)+geom_point(data=prediction_df,aes(x=Year,y=Fitted_Values,color="Prediction"),size=3,shape=18)+scale_color_manual(name="Legend",values=c("Actual Data"="red","Fitted Trend"="blue","Prediction"="green"))+labs(title="Exponential Trend of Subscribers with Prediction for 2024",x="Year",
+y="Subscribers (in millions)")+theme_minimal()
+```
+The plot shows the actual number of subscribers (in red), the fitted trend (in blue), and the predicted number of subscribers for 2024 (in green).
+
+- **Red Line (Actual Data)**: Represents the actual number of subscribers from 2014 to 2021.
+- **Blue Line (Fitted Trend)**: Represents the exponential trend fitted to the actual data.
+- **Green Dot (Prediction for 2024)**: Represents the predicted number of subscribers for 2024.
+
+## Observations from the Plot
+
+- **Exponential Growth**: The fitted trend (blue line) clearly shows an exponential growth pattern, where the number of subscribers increases rapidly over time.
+- **Prediction for 2024**: The green dot for 2024 shows a substantial increase in the number of subscribers, reaching 667.03 million.
+- **Data Fit**: The fitted trend follows the actual data closely until 2020, but it diverges significantly in 2021, indicating potential overestimation in the later years.
+
+The exponential trend model predicts a very high number of subscribers for 2024, which may be overly optimistic given the divergence observed in the later years of the actual data. This indicates that while the exponential model captures the general growth trend, it may not fully account for changes in growth rate or other factors affecting subscriber numbers beyond 2021.
